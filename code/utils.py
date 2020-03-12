@@ -151,7 +151,7 @@ def aggregate_data(temp, case='All'):
     """
 
     temp_ = temp.copy()
-    if case == 'All':
+    if case.upper() == 'ALL':
         temp_ = np.reshape(temp_, newshape=(12, 27, 11, 25, 36), order='F')
     else:
         temp_ = np.reshape(temp_, newshape=(12, 27, 11, 13, 12), order='F')
@@ -393,3 +393,32 @@ def get_zone_boundaries(case='All'):
             Exception('"case" argument must me either "All" for the full study zone or "Sel" for the restricted one'))
 
     return frlat, tolat, frlon, tolon
+
+
+def get_projection_errors(true_labels, pred_labels):
+    """
+    Compute a performance vector, one entry for each class, based on true labels
+
+    :param: true_labels: true labels obtained by observation data
+    :param: pred_labels: labels obtained by projecting model data on the trained SOM model (on observations)
+
+    :return: an "nb_class"-length numpy.array containing performances for each class (ground is ignored)
+    """
+
+    true_labels = true_labels.flatten()
+    pred_labels = pred_labels.flatten()
+
+    nb_classes = max(true_labels)
+
+    perf_vector = np.zeros(nb_classes, dtype=np.int)  # vecteur des performances !
+    true_labels_count = np.zeros(nb_classes, dtype=np.int)
+
+    for true_label, pred_label in zip(true_labels, pred_labels):
+        true_labels_count[true_label - 1] += 1
+
+        if true_label == 0 or pred_label == 0:
+            continue
+        if true_label == pred_label:
+            perf_vector[true_label - 1] += 1
+
+    return np.array([x/y for x, y in zip(perf_vector, true_labels_count)])

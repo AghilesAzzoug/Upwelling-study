@@ -13,10 +13,10 @@ import UW3_triedctk as ctk
 
 if __name__ == '__main__':
     # todo: get it from CMD
-    CASE = 'All'
+    CASE = 'Sel'
     SAVE_MODEL = True
-    NB_CLASSES = 4
-    frlat, tolat, frlon, tolon = utils.get_zone_boundaries()
+    NB_CLASSES = 7
+    frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
     file_path = os.path.join(config.OBS_DATA_PATH, config.USED_MODEL_FILE_NAME)
     data_label_base, temp, lon, lat, lev = utils.read_data(file_path)
     temp, lon, lat, ilat, ilon = utils.get_zone_obs(temp, lon, lat, size_reduction=CASE, frlon=frlon, tolon=tolon,

@@ -1,7 +1,7 @@
 # -*- coding: ISO-8859-1 -*-
 
 OBS_DATA_PATH = '../../data/Obs'  # Observations folder path
-MODELS_DATA_PATH = '../../data/PL2020/Model'  # Models folder path
+MODELS_DATA_PATH = '../../data/Model'  # Models folder path
 VERBOSE = True  # Default verbosity
 SEED = 0  # Default seed
 
