@@ -61,11 +61,11 @@ if __name__ == '__main__':
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
 
-    POPULATION_SIZE = 2
-    NB_GENERATIONS = 100
-    MUTATION_PROBABILITY = 0.1
+    POPULATION_SIZE = 100
+    NB_GENERATIONS = 150
+    MUTATION_PROBABILITY = 0.35
     CROSSOVER_PROBABILITY = 0.8
-    GE_PROBABILITY = 0.5
+    GE_PROBABILITY = 0.65
     # read the trained model file
     # output files (perfs) definition
     if CASE.upper() == 'ALL':
@@ -135,13 +135,13 @@ if __name__ == '__main__':
 
         def register_step(self, g, population, engine):
             best_indv = population.best_indv(engine.fitness)
-            msg = 'Generation: {}, best fitness: {:.3f}'.format(g, engine.fmax)
+            msg = 'Generation: {}, best fitness: {:.3f}, weights: {}'.format(g, engine.fmax, best_indv)
             engine.logger.info(msg)
 
     if config.VERBOSE:
         print('\n\n[+] Executing a genetic algorithm with parameters :')
         print(f'\t\tPop. size : {POPULATION_SIZE}')
-        print(f'\t\tNb generation : {NB_GENERATIONS}')
+        print(f'\t\tNumber of generations : {NB_GENERATIONS}')
         print(f'\t\tSelection : Roulette Wheel')
         print(f'\t\tCrossover probability : {CROSSOVER_PROBABILITY}')
         print(f'\t\tGenome exchange probability : {GE_PROBABILITY}')
