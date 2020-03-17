@@ -52,7 +52,7 @@ def setupEnv():
 
     MODELS_VALUES = np.array(MODELS_VALUES)
     if config.VERBOSE:
-        print('[!] Genetic environment correctly configured.')
+        print('\n [!] Genetic environment correctly configured.')
 
 if __name__ == '__main__':
 
@@ -61,6 +61,11 @@ if __name__ == '__main__':
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
 
+    POPULATION_SIZE = 2
+    NB_GENERATIONS = 100
+    MUTATION_PROBABILITY = 0.1
+    CROSSOVER_PROBABILITY = 0.8
+    GE_PROBABILITY = 0.5
     # read the trained model file
     # output files (perfs) definition
     if CASE.upper() == 'ALL':
@@ -76,11 +81,11 @@ if __name__ == '__main__':
 
     indv_template = ProbabilisticIndividual(ranges=[(0, 1) for _ in range(config.NB_MODELS)], eps=0.001)
 
-    population = Population(indv_template=indv_template, size=2)
+    population = Population(indv_template=indv_template, size=POPULATION_SIZE)
     population.init()
     selection = RouletteWheelSelection()
-    crossover = UniformCrossover(pc=0.8, pe=0.5)
-    mutation = FlipBitMutation(pm=0.1)
+    crossover = UniformCrossover(pc=CROSSOVER_PROBABILITY, pe=GE_PROBABILITY)
+    mutation = FlipBitMutation(pm=MUTATION_PROBABILITY)
 
     engine = GAEngine(population=population, selection=selection, crossover=crossover, mutation=mutation,
                       analysis=[FitnessStore])
@@ -119,7 +124,7 @@ if __name__ == '__main__':
             model_labels_ = model_labels.reshape(11, 13, 12, order='A')
 
         perf_vector = utils.get_projection_errors(true_labels=true_labels, pred_labels=model_labels_)
-        print("perf = " + str(float(np.mean(perf_vector))))
+        # print("perf = " + str(float(np.mean(perf_vector))))
         return float(np.mean(perf_vector))
 
 
@@ -133,5 +138,13 @@ if __name__ == '__main__':
             msg = 'Generation: {}, best fitness: {:.3f}'.format(g, engine.fmax)
             engine.logger.info(msg)
 
+    if config.VERBOSE:
+        print('\n\n[+] Executing a genetic algorithm with parameters :')
+        print(f'\t\tPop. size : {POPULATION_SIZE}')
+        print(f'\t\tNb generation : {NB_GENERATIONS}')
+        print(f'\t\tSelection : Roulette Wheel')
+        print(f'\t\tCrossover probability : {CROSSOVER_PROBABILITY}')
+        print(f'\t\tGenome exchange probability : {GE_PROBABILITY}')
+        print(f'\t\tMutation probability : {MUTATION_PROBABILITY}')
 
-    engine.run(ng=2)
+    engine.run(ng=NB_GENERATIONS)

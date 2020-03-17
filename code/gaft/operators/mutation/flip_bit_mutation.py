@@ -9,6 +9,7 @@ from ...mpiutil import MPIUtil
 from ...plugin_interfaces.operators.mutation import Mutation
 from ...components.binary_individual import BinaryIndividual
 from ...components.decimal_individual import DecimalIndividual
+from ...components.probabilistic_individual import ProbabilisticIndividual
 
 mpi = MPIUtil()
 
@@ -53,6 +54,9 @@ class FlipBitMutation(Mutation):
                     n_intervals = (b - a)//eps
                     n = int(uniform(0, n_intervals + 1))
                     individual.chromsome[i] = a + n*eps
+                elif type(individual) is ProbabilisticIndividual:
+                    # added by Aghiles
+                    individual.chromsome[i] = random()
                 else:
                     raise TypeError('Wrong individual type: {}'.format(type(individual)))
 
