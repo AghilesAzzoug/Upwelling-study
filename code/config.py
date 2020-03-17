@@ -3,7 +3,7 @@
 OBS_DATA_PATH = '../../data/Obs'  # Observations folder path
 MODELS_DATA_PATH = '../../data/Model'  # Models folder path
 VERBOSE = True  # Default verbosity
-DISABLE_WARNING = False  # disable warning due to np.nan(s) in data
+DISABLE_WARNING = True  # disable warning due to np.nan(s) in data
 SEED = 0  # Default seed
 NB_MODELS = 27  # Number of models
 

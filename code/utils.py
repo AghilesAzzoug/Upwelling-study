@@ -422,3 +422,36 @@ def get_projection_errors(true_labels, pred_labels):
             perf_vector[true_label - 1] += 1
 
     return np.array([x/y for x, y in zip(perf_vector, true_labels_count)])
+
+
+def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_model, figure_prefix='GA_', save_file=True,
+                                  save_dir=OUTPUT_FIGURES_PATH):
+    global true_labels
+
+    temp = np.average(a=model_values, weights=solution_weights, axis=0)
+
+    agg_data = aggregate_data(temp, case=case)
+
+    all_model_data = agg_data.reshape(12, -1, order='A').T  # shape = 9900 (11*25*36), 12
+
+    model_data = pd.DataFrame.from_records(all_model_data).dropna(axis=0)
+
+    ocean_points_index = model_data.index.values  # ocean points index
+    model_data = model_data.values  # train data
+
+    model_labels = np.zeros(shape=(len(all_model_data)), dtype=int)
+
+    hac = AgglomerativeClustering(n_clusters=nb_classes)
+    hac = hac.fit(som_model.codebook)
+    ocean_predicted_labels = get_reverse_classification(ctk.findbmus(sm=som_model, Data=model_data), hac_labels=hac.labels_)
+    model_labels[ocean_points_index] = ocean_predicted_labels.flatten() + 1  # à cause du 0 de la terre
+
+    if case.upper() == 'ALL':
+        model_labels_ = model_labels.reshape(11, 25, 36, order='A')
+    elif case.upper() == 'SEL':
+        model_labels_ = model_labels.reshape(11, 13, 12, order='A')
+
+    perf_vector = get_projection_errors(true_labels=true_labels, pred_labels=model_labels_)
+    print(f'{"*"*10} Genetic algorithm results {"*"*10}')
+    print(f'\t\t[+] solution weights : {solution_weights}\n')
+    print(f'\t\t[+] perf vector for each one of the {nb_classes}')
