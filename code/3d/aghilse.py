@@ -10,6 +10,8 @@ import triedpy.triedsompy as SOM
 import utils
 import config
 import UW3_triedctk as ctk
+import mpi4py
+
 
 CASE = 'All'
 NB_CLASSES = 7

@@ -426,6 +426,8 @@ def get_projection_errors(true_labels, pred_labels):
 
 def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_model, figure_prefix='GA_', save_file=True,
                                   save_dir=OUTPUT_FIGURES_PATH):
+    #todo: terminer cette fonction
+    #todo: ajouter les affichages après la moyenne pondérée
     global true_labels
 
     temp = np.average(a=model_values, weights=solution_weights, axis=0)

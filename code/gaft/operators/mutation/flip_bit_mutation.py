@@ -49,11 +49,14 @@ class FlipBitMutation(Mutation):
                 if type(individual) is BinaryIndividual:
                     individual.chromsome[i] = genome^1
                 elif type(individual) is DecimalIndividual:
-                    a, b = individual.ranges[i]
-                    eps = individual.precisions[i]
-                    n_intervals = (b - a)//eps
-                    n = int(uniform(0, n_intervals + 1))
-                    individual.chromsome[i] = a + n*eps
+                    # a, b = individual.ranges[i]
+                    # eps = individual.precisions[i]
+                    # n_intervals = (b - a)//eps
+                    # n = int(uniform(0, n_intervals + 1))
+                    if individual.chromsome[i] == 1:
+                        individual.chromsome[i] = 0
+                    else:
+                        individual.chromsome[i] = 1
                 elif type(individual) is ProbabilisticIndividual:
                     # added by Aghiles
                     individual.chromsome[i] = random()

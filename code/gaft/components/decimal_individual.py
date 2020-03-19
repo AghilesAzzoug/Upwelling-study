@@ -4,7 +4,7 @@
 '''
 
 from .individual import IndividualBase
-
+import numpy as np
 
 class DecimalIndividual(IndividualBase):
     ''' Individual with decimal encoding.
@@ -19,6 +19,11 @@ class DecimalIndividual(IndividualBase):
         super(self.__class__, self).__init__(ranges, eps)
         # Initialize it randomly.
         self.init()
+        # added by Aghiles
+        solution_ = np.array(self.solution)
+        solution_[solution_ < 0.5] = 0
+        solution_[solution_ > 0.5] = 1
+        self.solution = list(solution_)
 
     def encode(self):
         ''' Encode solution to gene sequence

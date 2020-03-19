@@ -17,7 +17,7 @@ if config.DISABLE_WARNING:
     warnings.filterwarnings("ignore")
 
 from gaft import GAEngine
-from gaft.components import BinaryIndividual, ProbabilisticIndividual, Population
+from gaft.components import BinaryIndividual, ProbabilisticIndividual, DecimalIndividual, Population
 from gaft.operators import RouletteWheelSelection, UniformCrossover, FlipBitMutation
 
 # Analysis plugin base class.
@@ -56,18 +56,19 @@ def setupEnv():
 
 if __name__ == '__main__':
     """
-        Cas des poids (recherche de poids pour CHAQUE modèle)
+        Cas binaire (combinaison de modèles sans poids)
     """
+
     # todo: get it from CMD
     CASE = 'All'
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
 
-    POPULATION_SIZE = 20
+    POPULATION_SIZE = 30
     NB_GENERATIONS = 250
     MUTATION_PROBABILITY = 0.40
-    CROSSOVER_PROBABILITY = 0.8
-    GE_PROBABILITY = 0.65
+    CROSSOVER_PROBABILITY = 0.5
+    GE_PROBABILITY = 0.70
     # read the trained model file
     # output files (perfs) definition
     if CASE.upper() == 'ALL':
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     # print(MODELS_VALUES.shape)
     # print(MODELS_DICT)
 
-    indv_template = ProbabilisticIndividual(ranges=[(0, 1) for _ in range(config.NB_MODELS)], eps=0.001)
+    indv_template = DecimalIndividual(ranges=[(0, 1) for _ in range(config.NB_MODELS)], eps=0.001)
 
     population = Population(indv_template=indv_template, size=POPULATION_SIZE)
     population.init()
@@ -141,7 +142,7 @@ if __name__ == '__main__':
             engine.logger.info(msg)
 
     if config.VERBOSE:
-        print('\n\n[+] Executing a genetic algorithm with parameters :')
+        print('\n\n[+] Executing a (BINARY) genetic algorithm with parameters :')
         print(f'\t\tPop. size : {POPULATION_SIZE}')
         print(f'\t\tNumber of generations : {NB_GENERATIONS}')
         print(f'\t\tSelection : Roulette Wheel')
