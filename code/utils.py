@@ -457,3 +457,11 @@ def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_
     print(f'{"*"*10} Genetic algorithm results {"*"*10}')
     print(f'\t\t[+] solution weights : {solution_weights}\n')
     print(f'\t\t[+] perf vector for each one of the {nb_classes}')
+
+    plot_levels_3D_SOM(model_labels_, nb_classes=nb_classes,
+                             figure_title=f'Genetic result {NB_CLASSES} classes geographical representation',
+                             save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
+
+    plot_monthly_anomalies_3D_SOM(temperatures=model_data, labels=ocean_predicted_labels.flatten() + 1,
+                                        figure_title=f'Genetic result (1975-2005). Monthly Mean by Class',
+                                        save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')

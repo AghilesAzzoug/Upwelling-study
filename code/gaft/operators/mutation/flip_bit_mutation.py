@@ -53,7 +53,7 @@ class FlipBitMutation(Mutation):
                     # eps = individual.precisions[i]
                     # n_intervals = (b - a)//eps
                     # n = int(uniform(0, n_intervals + 1))
-                    if individual.chromsome[i] == 1:
+                    if individual.chromsome[i] > 1:
                         individual.chromsome[i] = 0
                     else:
                         individual.chromsome[i] = 1

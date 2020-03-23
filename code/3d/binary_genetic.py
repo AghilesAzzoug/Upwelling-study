@@ -18,7 +18,7 @@ if config.DISABLE_WARNING:
 
 from gaft import GAEngine
 from gaft.components import BinaryIndividual, ProbabilisticIndividual, DecimalIndividual, Population
-from gaft.operators import RouletteWheelSelection, UniformCrossover, FlipBitMutation
+from gaft.operators import RouletteWheelSelection, UniformCrossover, FlipBitMutation, TournamentSelection
 
 # Analysis plugin base class.
 from gaft.plugin_interfaces.analysis import OnTheFlyAnalysis
@@ -64,9 +64,9 @@ if __name__ == '__main__':
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
 
-    POPULATION_SIZE = 30
+    POPULATION_SIZE = 70
     NB_GENERATIONS = 250
-    MUTATION_PROBABILITY = 0.40
+    MUTATION_PROBABILITY = 0.45
     CROSSOVER_PROBABILITY = 0.5
     GE_PROBABILITY = 0.70
     # read the trained model file
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
     population = Population(indv_template=indv_template, size=POPULATION_SIZE)
     population.init()
-    selection = RouletteWheelSelection()
+    selection = TournamentSelection(tournament_size=10)# RouletteWheelSelection()
     crossover = UniformCrossover(pc=CROSSOVER_PROBABILITY, pe=GE_PROBABILITY)
     mutation = FlipBitMutation(pm=MUTATION_PROBABILITY)
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         print('\n\n[+] Executing a (BINARY) genetic algorithm with parameters :')
         print(f'\t\tPop. size : {POPULATION_SIZE}')
         print(f'\t\tNumber of generations : {NB_GENERATIONS}')
-        print(f'\t\tSelection : Roulette Wheel')
+        print(f'\t\tSelection : Tournament Selection') #Roulette Wheel')
         print(f'\t\tCrossover probability : {CROSSOVER_PROBABILITY}')
         print(f'\t\tGenome exchange probability : {GE_PROBABILITY}')
         print(f'\t\tMutation probability : {MUTATION_PROBABILITY}')

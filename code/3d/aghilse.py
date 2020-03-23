@@ -10,8 +10,11 @@ import triedpy.triedsompy as SOM
 import utils
 import config
 import UW3_triedctk as ctk
-import mpi4py
+#import mpi4py
 
+
+print(np.average(a=np.array([1, 2, 3]), weights=np.array([0.33, 0.33, 0.33])))
+exit(1)
 
 CASE = 'All'
 NB_CLASSES = 7
