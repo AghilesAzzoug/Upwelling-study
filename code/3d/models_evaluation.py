@@ -6,7 +6,6 @@ from sklearn.cluster import AgglomerativeClustering
 import pandas as pd
 
 sys.path.append("..")
-import triedpy.triedsompy as SOM
 import utils
 import config
 import UW3_triedctk as ctk

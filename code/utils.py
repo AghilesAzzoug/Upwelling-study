@@ -2,16 +2,11 @@ import numpy as np
 import sys, os
 from time import time
 import matplotlib.pyplot as plt
-from matplotlib import colors
-from matplotlib import cm
-from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
-import pickle
-from scipy.cluster.hierarchy import linkage, fcluster
 from sklearn.cluster import AgglomerativeClustering
 from matplotlib.colors import ListedColormap
-import matplotlib
 import pandas as pd
 import pickle
+from scipy.cluster.hierarchy import dendrogram, linkage
 
 import UW3_triedctk as ctk
 import netCDF4
@@ -252,7 +247,8 @@ def get_reverse_classification(bmus, hac_labels):
     return np.array([hac_labels[bmu] for bmu in bmus])
 
 
-def plot_levels_3D_SOM(labels, nb_classes=8, case='All', figure_title='3D SOM', save_file=True, save_dir=OUTPUT_FIGURES_PATH,
+def plot_levels_3D_SOM(labels, nb_classes=8, case='All', figure_title='3D SOM', save_file=True,
+                       save_dir=OUTPUT_FIGURES_PATH,
                        file_name=''):
     """
     Plot the 11 depths level from a SOM trained over 3D data
@@ -535,3 +531,90 @@ def set_lonlat_ticks(lon, lat, fontsize=12, lostep=1, lastep=1, step=None, londe
     plt.yticks(yticks, yticklabels, fontsize=fontsize)
     # set axis limits to previous value
     plt.axis(lax)
+
+
+def do_plot_dendrogram(data, nclass=None, datalinkg=None, indnames=None, method='ward', metric='euclidean',
+                       truncate_mode=None, title="dendrogram", titlefnsize=14, ytitle=0.98, xlabel=None, xlabelpad=10,
+                       xlabelrotation=0, ylabel=None, ylabelpad=10, ylabelrotation=90, labelfnsize=10, labelrotation=0,
+                       labelsize=10, labelha='center', labelva='top', dendro_linewidth=2, tickpad=2, axeshiftfactor=150,
+                       figsize=(14, 6), wspace=0.0, hspace=0.2, top=0.92, bottom=0.12, left=0.05, right=0.99):
+    """
+    plot SOM dendrogram
+    """
+
+    if datalinkg is None:
+        # Performs hierarchical/agglomerative clustering on the condensed distance matrix data
+        datalinkg = linkage(data, method=method, metric=metric)
+    #
+    Ncell = data.shape[0]
+    minref = np.min(data)
+    maxref = np.max(data)
+    #
+    fig = plt.figure(figsize=figsize, facecolor='w')
+    fignum = fig.number  # numero de figure en cours ...
+    plt.subplots_adjust(wspace=wspace, hspace=hspace, top=top, bottom=bottom, left=left, right=right)
+    #
+    if nclass is None:
+        # dendrogramme sans controle de color_threshold (on laisse par defaut ...)
+        R_ = dendrogram(datalinkg, p=Ncell, truncate_mode=truncate_mode,
+                        orientation='top', leaf_font_size=6, labels=indnames,
+                        leaf_rotation=labelrotation)
+    else:
+        # calcule la limite de decoupage selon le nombre de classes ou clusters
+        max_d = np.sum(datalinkg[[-nclass + 1, -nclass], 2]) / 2
+        color_threshold = max_d
+
+        with plt.rc_context({'lines.linewidth': dendro_linewidth}):  # Temporarily override the default line width
+            R_ = dendrogram(datalinkg, p=Ncell, truncate_mode=truncate_mode,
+                            color_threshold=color_threshold,
+                            orientation='top', leaf_font_size=6, labels=indnames,
+                            leaf_rotation=labelrotation)
+
+        plt.axhline(y=max_d, c='k')
+
+    plt.tick_params(axis='x', reset=True)
+    plt.tick_params(axis='x', which='major', direction='inout', length=7, width=dendro_linewidth,
+                    pad=tickpad, top=False, bottom=True,  # rotation_mode='anchor',
+                    labelrotation=labelrotation, labelsize=labelsize)
+
+    if indnames is None:
+        L = np.narange(Ncell)
+    else:
+        L_ = np.array(indnames)
+    plt.xticks((np.arange(Ncell) * 10) + 5, L_[R_['leaves']],
+               horizontalalignment=labelha, verticalalignment=labelva)
+    #
+    plt.grid(axis='y')
+    if xlabel is not None:
+        plt.xlabel(xlabel, labelpad=xlabelpad, rotation=xlabelrotation, fontsize=labelfnsize)
+    if ylabel is not None:
+        plt.ylabel(ylabel, labelpad=ylabelpad, rotation=ylabelrotation, fontsize=labelfnsize)
+    if axeshiftfactor is not None:
+        lax = plt.axis()
+        daxy = (lax[3] - lax[2]) / axeshiftfactor
+        plt.axis([lax[0], lax[1], lax[2] - daxy, lax[3]])
+    plt.title(title, fontsize=titlefnsize, y=ytitle)
+
+    return R_
+
+
+def do_plot_ct_dendrogram(sMapO, nb_class, datalinkg=None, method='ward', metric='euclidean', truncate_mode=None,
+                          title="SOM MAP dendrogram", titlefnsize=14, ytitle=0.98, xlabel="neurons",
+                          ylabel="inter class distance", labelfnsize=10, labelrotation=0, labelsize=10, figsize=(14, 6),
+                          wspace=0.0, hspace=0.2, top=0.92, bottom=0.12, left=0.05, right=0.99):
+    """
+    Wrapper for plot SOM dendrogram
+    """
+    ncodbk = sMapO.codebook.shape[0]
+    # print(sMapO.codebook)
+    do_plot_dendrogram(sMapO.codebook, nclass=nb_class, datalinkg=datalinkg,
+                       indnames=np.arange(ncodbk) + 1,
+                       method=method, metric=metric,
+                       truncate_mode=truncate_mode,
+                       title=title, ytitle=ytitle, titlefnsize=titlefnsize,
+                       xlabel=xlabel, ylabel=ylabel, labelfnsize=labelfnsize,
+                       labelrotation=labelrotation, labelsize=labelsize,
+                       figsize=figsize,
+                       wspace=wspace, hspace=hspace, top=top, bottom=bottom, left=left, right=right,
+                       )
+    plt.show()

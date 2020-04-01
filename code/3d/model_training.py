@@ -6,14 +6,13 @@ from sklearn.cluster import AgglomerativeClustering
 import pandas as pd
 
 sys.path.append("..")
-import triedpy.triedsompy as SOM
 import utils
 import config
 import UW3_triedctk as ctk
 
 if __name__ == '__main__':
     # todo: get it from CMD
-    CASE = 'All'
+    CASE = 'All' # All for full study zone and Sel for the restricted zone
     SAVE_MODEL = False
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
@@ -57,10 +56,15 @@ if __name__ == '__main__':
             utils.saveSOM(som_object=sMapO, true_labels=predicted_labels, save_dir=config.OUTPUT_TRAINED_MODELS_PATH,
                           file_name=config.ZSEL_SOM_3D_MODEL_NAME)
 
+    # classification plots
     utils.plot_levels_3D_SOM(predicted_labels_, nb_classes=NB_CLASSES, case=CASE,
                              figure_title=f'Observations (1979-2005), {NB_CLASSES} classes geographical representation',
                              save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
 
+    # monthly anomalies plot
     utils.plot_monthly_anomalies_3D_SOM(temperatures=train_data, labels=ocean_predicted_labels.flatten() + 1,
                                         figure_title='Observation (1979-2005). Monthly Mean by Class', save_file=True,
                                         save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
+
+    # dendrogram plot
+    utils.do_plot_ct_dendrogram(sMapO, nb_class=NB_CLASSES)
