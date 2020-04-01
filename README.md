@@ -2,7 +2,9 @@
 
 ## Context:
 the code was written in the case of a long project of the master TRIED of Paris-Saclay University. 
+
 @authors : Aghiles Azzoug & Constantin Bône
+
 @supervisors : Carlos Mejia, Sylvie Thiria, and Michel Crepon
 
 
