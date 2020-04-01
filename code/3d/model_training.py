@@ -13,8 +13,8 @@ import UW3_triedctk as ctk
 
 if __name__ == '__main__':
     # todo: get it from CMD
-    CASE = 'Sel'
-    SAVE_MODEL = True
+    CASE = 'All'
+    SAVE_MODEL = False
     NB_CLASSES = 7
     frlat, tolat, frlon, tolon = utils.get_zone_boundaries(case=CASE)
     file_path = os.path.join(config.OBS_DATA_PATH, config.USED_MODEL_FILE_NAME)
@@ -57,10 +57,10 @@ if __name__ == '__main__':
             utils.saveSOM(som_object=sMapO, true_labels=predicted_labels, save_dir=config.OUTPUT_TRAINED_MODELS_PATH,
                           file_name=config.ZSEL_SOM_3D_MODEL_NAME)
 
-    utils.plot_levels_3D_SOM(predicted_labels_, nb_classes=NB_CLASSES,
-                             figure_title=f'Observations (1975-2005), {NB_CLASSES} classes geographical representation',
+    utils.plot_levels_3D_SOM(predicted_labels_, nb_classes=NB_CLASSES, case=CASE,
+                             figure_title=f'Observations (1979-2005), {NB_CLASSES} classes geographical representation',
                              save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
 
     utils.plot_monthly_anomalies_3D_SOM(temperatures=train_data, labels=ocean_predicted_labels.flatten() + 1,
-                                        figure_title='Observation (1975-2005). Monthly Mean by Class', save_file=True,
+                                        figure_title='Observation (1979-2005). Monthly Mean by Class', save_file=True,
                                         save_dir=config.OUTPUT_FIGURES_PATH, file_name='')

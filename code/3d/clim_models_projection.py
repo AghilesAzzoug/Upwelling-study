@@ -59,12 +59,12 @@ if __name__ == '__main__':
     elif CASE.upper() == 'SEL':
         model_labels_ = model_labels.reshape(11, 13, 12, order='A')
 
-    utils.plot_levels_3D_SOM(model_labels_, nb_classes=NB_CLASSES,
-                             figure_title=f'Model {data_label_base} (1975-2005), {NB_CLASSES} classes geographical representation',
+    utils.plot_levels_3D_SOM(model_labels_, nb_classes=NB_CLASSES, case=CASE,
+                             figure_title=f'Model {data_label_base} (1979-2005), {NB_CLASSES} classes geographical representation',
                              save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
 
     utils.plot_monthly_anomalies_3D_SOM(temperatures=model_data, labels=ocean_predicted_labels.flatten() + 1,
-                                        figure_title=f'Model {data_label_base} (1975-2005). Monthly Mean by Class',
+                                        figure_title=f'Model {data_label_base} (1979-2005). Monthly Mean by Class',
                                         save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
 
     perf_vector = utils.get_projection_errors(true_labels=true_labels, pred_labels=model_labels_)

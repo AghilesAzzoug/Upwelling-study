@@ -22,6 +22,8 @@ import triedpy.triedsompy as SOM
 
 np.set_printoptions(threshold=sys.maxsize)
 
+CMAP = ListedColormap(["brown", "blue", "lawngreen", "red", "purple", "pink", "yellow", "orange"])
+
 
 def read_data(data_path, verbose=VERBOSE):
     """
@@ -250,7 +252,7 @@ def get_reverse_classification(bmus, hac_labels):
     return np.array([hac_labels[bmu] for bmu in bmus])
 
 
-def plot_levels_3D_SOM(labels, nb_classes=8, figure_title='3D SOM', save_file=True, save_dir=OUTPUT_FIGURES_PATH,
+def plot_levels_3D_SOM(labels, nb_classes=8, case='All', figure_title='3D SOM', save_file=True, save_dir=OUTPUT_FIGURES_PATH,
                        file_name=''):
     """
     Plot the 11 depths level from a SOM trained over 3D data
@@ -262,20 +264,27 @@ def plot_levels_3D_SOM(labels, nb_classes=8, figure_title='3D SOM', save_file=Tr
     :param save_dir: output directory (default value in config.py)
     :param file_name : file name for png output file
     """
+    global CMAP
 
     fig, axs = plt.subplots(3, 4)
-    cmap = plt.get_cmap('jet', nb_classes + 1)  # + 1 because of the earth
+
+    if case.upper() == 'ALL':
+        plt.setp(axs, xticks=[5, 20, 35], xticklabels=[-40, -25, -9], yticks=[0, 10, 20], yticklabels=[30, 20, 10])
+    else:
+        plt.setp(axs, xticks=[2, 6, 10], xticklabels=[-26, -22, -18], yticks=[0, 5, 10], yticklabels=[23, 18, 13])
+
+    # cmap = plt.get_cmap('jet', nb_classes + 1)  # + 1 because of the earth
 
     for index, level in enumerate(labels):
         classes = labels[index]
 
-        f = axs[index // 4, index % 4].imshow(classes, cmap=cmap, interpolation='none', vmin=0, vmax=nb_classes)
-        plt.colorbar(f, ax=axs[index // 4, index % 4], ticks=np.arange(0, nb_classes + 1), shrink=0.7)
+        f = axs[index // 4, index % 4].imshow(classes, cmap=CMAP, interpolation='none', vmin=0, vmax=nb_classes)
+
+        # plt.colorbar(f, ax=axs[index // 4, index % 4], ticks=np.arange(0, nb_classes + 1), shrink=0.7)
         axs[index // 4, index % 4].set_title(f'{index * 20 + 10}m')
-
     fig.delaxes(axs[2][3])
-    fig.suptitle(figure_title)
-
+    plt.colorbar(f, ax=axs[2, 3], ticks=np.arange(0, nb_classes + 1), shrink=1)
+    fig.suptitle(figure_title, y=1)
     if save_file:
         if file_name == '':
             # if the name is not specified, use the title
@@ -283,7 +292,6 @@ def plot_levels_3D_SOM(labels, nb_classes=8, figure_title='3D SOM', save_file=Tr
 
         output_path = os.path.join(save_dir, file_name)
         plt.savefig(output_path)
-
     plt.show()
 
 
@@ -299,8 +307,8 @@ def plot_monthly_anomalies_3D_SOM(temperatures, labels, figure_title='Monthly an
     :param save_dir: output directory (default value in config.py)
     :param file_name : file name for png output file
     """
-
-    cmap = plt.get_cmap('jet', max(labels.flatten()) + 1)
+    global CMAP
+    # cmap = plt.get_cmap('jet', max(labels.flatten()) + 1)
 
     plt.figure(figsize=(17, 8))
 
@@ -309,7 +317,7 @@ def plot_monthly_anomalies_3D_SOM(temperatures, labels, figure_title='Monthly an
         monthy_anom = values.mean(axis=0)
         monthy_dev = values.std(axis=0)
         # plt.plot(monthy_anom, label=f'classe = {label}', color=cmap(label))
-        plt.errorbar(list(range(12)), monthy_anom, monthy_dev, label=f'class = {label}', color=cmap(label))
+        plt.errorbar(list(range(12)), monthy_anom, monthy_dev, label=f'class = {label}', color=CMAP(label))
 
     plt.title(figure_title)
     plt.legend(loc='best')
@@ -421,15 +429,12 @@ def get_projection_errors(true_labels, pred_labels):
         if true_label == pred_label:
             perf_vector[true_label - 1] += 1
 
-    return np.array([x/y for x, y in zip(perf_vector, true_labels_count)])
+    return np.array([x / y for x, y in zip(perf_vector, true_labels_count)])
 
 
-def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_model, figure_prefix='GA_', save_file=True,
-                                  save_dir=OUTPUT_FIGURES_PATH):
-    #todo: terminer cette fonction
-    #todo: ajouter les affichages après la moyenne pondérée
-    global true_labels
-
+def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_model, true_labels, figure_prefix='GA_',
+                          save_file=True,
+                          save_dir=OUTPUT_FIGURES_PATH):
     temp = np.average(a=model_values, weights=solution_weights, axis=0)
 
     agg_data = aggregate_data(temp, case=case)
@@ -445,7 +450,8 @@ def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_
 
     hac = AgglomerativeClustering(n_clusters=nb_classes)
     hac = hac.fit(som_model.codebook)
-    ocean_predicted_labels = get_reverse_classification(ctk.findbmus(sm=som_model, Data=model_data), hac_labels=hac.labels_)
+    ocean_predicted_labels = get_reverse_classification(ctk.findbmus(sm=som_model, Data=model_data),
+                                                        hac_labels=hac.labels_)
     model_labels[ocean_points_index] = ocean_predicted_labels.flatten() + 1  # à cause du 0 de la terre
 
     if case.upper() == 'ALL':
@@ -459,9 +465,73 @@ def show_genetic_solution(model_values, solution_weights, case, nb_classes, som_
     print(f'\t\t[+] perf vector for each one of the {nb_classes}')
 
     plot_levels_3D_SOM(model_labels_, nb_classes=nb_classes,
-                             figure_title=f'Genetic result {NB_CLASSES} classes geographical representation',
-                             save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
+                       figure_title=f'Genetic result {NB_CLASSES} classes geographical representation',
+                       save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
 
     plot_monthly_anomalies_3D_SOM(temperatures=model_data, labels=ocean_predicted_labels.flatten() + 1,
-                                        figure_title=f'Genetic result (1975-2005). Monthly Mean by Class',
-                                        save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
+                                  figure_title=f'Genetic result (1979-2005). Monthly Mean by Class',
+                                  save_file=True, save_dir=config.OUTPUT_FIGURES_PATH, file_name='')
+
+
+def set_lonlat_ticks(lon, lat, fontsize=12, lostep=1, lastep=1, step=None, londecal=None, latdecal=None,
+                     roundlabelok=True, lengthen=True, verbose=False):
+    ''' Pour tracer les "ticks" et "ticklabels" des figures de type geographique,
+        ou les axes ce sont les Latitudes et Longitudes
+    '''
+    if londecal is None:
+        londecal = (lon[1] - lon[0]) / 2
+        if lon[0] < lon[1]:
+            londecal = -londecal
+    if latdecal is None:
+        latdecal = (lat[1] - lat[0]) / 2
+        if lat[0] < lat[1]:
+            latdecal = -latdecal
+    if step is not None:
+        # force la même valeur de pas dans les ticks x et y
+        lostep = step
+        lastep = step
+    if verbose:
+        print('londecal: {}\nlatdecal: {}'.format(londecal, latdecal))
+    # ralonge les lon et les lat
+    if verbose:
+        print('LON-LAT:\n  {}\n  {}'.format(lon, lat))
+    if lengthen:
+        lon = np.concatenate((lon, [lon[-1] + (lon[1] - lon[0])]))
+        lat = np.concatenate((lat, [lat[-1] + (lat[1] - lat[0])]))
+        if verbose:
+            print('LENGHTED LON-LAT:\n  {}\n  {}'.format(lon, lat))
+    nLon = lon.shape[0]
+    nLat = lat.shape[0]
+    # current axis limits
+    lax = plt.axis()
+    # Ticks
+    xticks = np.arange(londecal, nLon, lostep)
+    yticks = np.arange(latdecal, nLat, lastep)
+    # Ticklabels
+    if 0:
+        xticklabels = lon[np.arange(0, nLon, lostep)]
+        yticklabels = lat[np.arange(0, nLat, lastep)]
+    else:
+        xticklabels = lon[np.arange(0, nLon, lostep)]
+        yticklabels = lat[np.arange(0, nLat, lastep)]
+        if lon[0] < lon[1]:
+            xticklabels += londecal
+        else:
+            xticklabels -= londecal
+        if lat[0] < lat[1]:
+            yticklabels += latdecal
+        else:
+            yticklabels -= latdecal
+    if verbose:
+        print('Tiks:\n  {}\n  {}'.format(xticks, yticks))
+        print('Labels:\n  {}\n  {}'.format(xticklabels, yticklabels))
+    if roundlabelok:
+        xticklabels = np.round(xticklabels).astype(int)
+        yticklabels = np.round(yticklabels).astype(int)
+        if verbose:
+            print('Rounded Labels:\n  {}\n  {}'.format(xticklabels, yticklabels))
+    #
+    plt.xticks(xticks, xticklabels, fontsize=fontsize)
+    plt.yticks(yticks, yticklabels, fontsize=fontsize)
+    # set axis limits to previous value
+    plt.axis(lax)
