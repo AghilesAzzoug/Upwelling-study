@@ -1,7 +1,7 @@
 ##### Case study for the evaluation of climate multimodel ensembles in the Senegalese-Mauritanian **upwelling** region: ocean temperature study. The main purpose was to find a subset of climate models that best represents the “upwelling” phenomenon and use it for forecasting ocean temperature.
 
 ## Context:
-the code was written in the case of a long project of TRIED master at Paris-Saclay University. 
+The code was written in the case of a long project of TRIED master at Paris-Saclay University. 
 
 @authors : Aghiles Azzoug & Constantin Bône
 
