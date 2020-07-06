@@ -22,7 +22,7 @@ ZALL_MODELS_CUMUL_PERF_FILE_NAME = 'Cumul_perf_df_ZALL.csv'  # cumul perfs. file
 ZSEL_MODELS_CUMUL_PERF_FILE_NAME = 'Cumul_perf_df_ZSEL.csv'  # cumul perfs. file (restricted zone)
 
 ZALL_MODELS_FINAL_PERF_FILE_NAME_CSV = 'Final_perf_df_ZALL.csv'  # final perfs. file (full zone)
-ZSEL_MODELS_FINAL_PERF_FILE_NAME_CSV = 'Final_perf_df_ZSEL.csv'  # final perfs. file (full zone)
+ZSEL_MODELS_FINAL_PERF_FILE_NAME_CSV = 'Final_perf_df_ZSEL.csv'  # final perfs. file (restricted zone)
 
 ZALL_MODELS_FINAL_PERF_FILE_NAME_HTML = 'Final_perf_df_ZALL.html'  # final perfs. file (full zone) HTML format
-ZSEL_MODELS_FINAL_PERF_FILE_NAME_HTML = 'Final_perf_df_ZSEL.html'  # final perfs. file (full zone) HTML format
+ZSEL_MODELS_FINAL_PERF_FILE_NAME_HTML = 'Final_perf_df_ZSEL.html'  # final perfs. file (restricted zone) HTML format
